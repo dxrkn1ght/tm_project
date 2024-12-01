@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Management</title>
+</head>
+<body>
+<h1>Student Management</h1>
+<h2>Create New Student</h2>
+<form method="get">
+    <label for="first_name">First Name:</label>
+    <br>
+    <input type="text" id="first_name" name="first_name">
+    <br><br>
+    <label for="last_name">Last Name:</label>
+    <br>
+    <input type="text" id="last_name" name="last_name">
+    <br><br>
+    <label for="email">Email:</label>
+    <br>
+    <input type="email" id="email" name="email">
+    <br><br>
+    <label for="date_of_birth">Date of Birth:</label>
+    <br>
+    <input type="date" id="date_of_birth" name="date_of_birth">
+    <br><br>
+    <label for="gender">Gender:</label>
+    <br>
+    <select id="gender" name="gender">
+        <option value="Select Gender">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+    </select>
+    <br><br>
+    <label for="address">Address</label>
+    <textarea id="address" name="address"></textarea>
+    <br><br>
+
+    <input type="submit" value="Create Student">
+    <br><br>
+</form>
+<table border="1">
+    <thead>
+    <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email</th>
+        <th>Date of Birth</th>
+        <th>Gender</th>
+        <th>Address</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for student in students %}
+        <tr>
+            <td>{{ student.first_name }}</td>
+            <td>{{ student.last_name }}</td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.date_of_birth }}</td>
+            <td>{{ student.gender }}</td>
+            <td>{{ student.address }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>
