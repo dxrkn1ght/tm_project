@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-container, .table-container {
+            margin: 20px 0;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table thead {
+            background-color: #333;
+            color: white;
+        }
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+        }
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+        .edit-btn {
+            background-color: #2196F3;
+        }
+        .delete-btn {
+            background-color: #f44336;
+        }
+        .edit-btn:hover {
+            background-color: #0b7dda;
+        }
+        .delete-btn:hover {
+            background-color: #da190b;
+        }
+        .btn {
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Course Management</h1>
+        <div class="form-container">
+            <h2>Create New Course</h2>
+            <form id="courseForm">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required>
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" rows="4" required></textarea>
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" name="startDate" required>
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" name="endDate" required>
+                <label for="maxStudents">Max Students:</label>
+                <input type="number" id="maxStudents" name="maxStudents" required>
+                <button type="button" id="addCourseBtn" class="btn">Create Course</button>
+            </form>
+        </div>
+        <div class="table-container">
+            <h2>Course List</h2>
+            <table id="courseTable">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Max Students</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        const courseForm = document.getElementById('courseForm');
+        const courseTable = document.getElementById('courseTable').querySelector('tbody');
+        const addCourseBtn = document.getElementById('addCourseBtn');
+
+        function loadCourses() {
+            const courses = JSON.parse(localStorage.getItem('courses')) || [];
+            courses.forEach(course => addCourseToTable(course));
+        }
+
+        function saveCourse(course) {
+            const courses = JSON.parse(localStorage.getItem('courses')) || [];
+            courses.push(course);
+            localStorage.setItem('courses', JSON.stringify(courses));
+        }
+
+        function updateLocalStorage() {
+            const rows = Array.from(courseTable.children);
+            const courses = rows.map(row => {
+                return {
+                    title: row.cells[0].textContent,
+                    description: row.cells[1].textContent,
+                    startDate: row.cells[2].textContent,
+                    endDate: row.cells[3].textContent,
+                    maxStudents: row.cells[4].textContent,
+                };
+            });
+            localStorage.setItem('courses', JSON.stringify(courses));
+        }
+
+        function addCourseToTable(course) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${course.title}</td>
+                <td>${course.description}</td>
+                <td>${course.startDate}</td>
+                <td>${course.endDate}</td>
+                <td>${course.maxStudents}</td>
+                <td>
+                    <button class="btn edit-btn">Edit</button>
+                    <button class="btn delete-btn">Delete</button>
+                </td>
+            `;
+
+            row.querySelector('.delete-btn').addEventListener('click', function () {
+                row.remove();
+                updateLocalStorage();
+            });
+
+            row.querySelector('.edit-btn').addEventListener('click', function () {
+                document.getElementById('title').value = course.title;
+                document.getElementById('description').value = course.description;
+                document.getElementById('startDate').value = course.startDate;
+                document.getElementById('endDate').value = course.endDate;
+                document.getElementById('maxStudents').value = course.maxStudents;
+                row.remove();
+                updateLocalStorage();
+            });
+
+            courseTable.appendChild(row);
+        }
+
+        addCourseBtn.addEventListener('click', function () {
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const maxStudents = document.getElementById('maxStudents').value;
+
+            if (title && description && startDate && endDate && maxStudents) {
+                const course = { title, description, startDate, endDate, maxStudents };
+                addCourseToTable(course);
+                saveCourse(course);
+                courseForm.reset();
+            } else {
+                alert('Please fill in all fields');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', loadCourses);
+    </script>
+</body>
+</html>
